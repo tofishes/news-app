@@ -1,14 +1,20 @@
 import React, { Component } from 'react';
-import { Alert, TouchableHighlight } from 'react-native';
+import { TouchableHighlight } from 'react-native';
 import PropTypes from 'prop-types';
 
+import { alert } from '../components/tip';
+
 export default class Link extends Component {
-  onClick() {
-    Alert(this.props.href);
+  onPress() {
+    alert(this.props.href);
   }
 
   render() {
-    return <TouchableHighlight onClick={this.onClick}>{this.props.children}</TouchableHighlight>;
+    return (
+      <TouchableHighlight onPress={this.onPress.bind(this)}>
+        {this.props.children}
+      </TouchableHighlight>
+    );
   }
 }
 
