@@ -18,12 +18,23 @@ const request = axios.create({
   }
 });
 
+function getPage(list, page, pageSize = 10) {
+  const end = page * pageSize;
+  const start = end - pageSize;
+
+  return list.slice(start, end);
+}
+
 export default {
   async getNewsList(category = 'headline', page = 1) {
     const response = await request.get(categoryMap[category]);
 
     const data = vc.set(response.data || {});
     const { status } = response;
+    // 人为分页
+    const list = data.getList('relations')
+      .sort((a, b) => b.content.lastUpdated - a.content.lastUpdated);
+    data.relations = getPage(list, page);
 
     return { data, status };
   }
