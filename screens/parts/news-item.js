@@ -6,8 +6,7 @@ import Link from '../../components/link';
 import Image from '../../components/image';
 
 import { spoken } from '../../libs/date';
-import colors from '../../libs/colors';
-import styles from '../../libs/styles';
+import styles, { colors } from '../../libs/styles';
 
 const layout = {
   row: {
@@ -15,20 +14,20 @@ const layout = {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     padding: 10,
-    height: 95,
     borderColor: colors.line,
     borderBottomWidth: 1,
     borderStyle: 'solid'
   },
   cover: {
-    width: 133,
-    height: 75
+    width: 102,
+    height: 78
   },
   info: {
-    flex: 1,
+    flex: 2,
     flexDirection: 'column',
     justifyContent: 'space-between',
-    marginLeft: 10
+    marginLeft: 10,
+    width: 200
   }
 };
 
@@ -41,14 +40,20 @@ export default class NewsItem extends PureComponent {
     }
 
     const [cover] = content.relations;
+    const detailPage = {
+      screen: 'news-detail',
+      param: {
+        id: content.id
+      }
+    };
 
     return (
-      <Link href={content.id}>
+      <Link to={detailPage}>
         <View style={layout.row}>
           <Image style={layout.cover} source={{ uri: cover.content.href }} />
           <View style={layout.info}>
             <Text style={styles.title}>{content.name}</Text>
-            <Text style={styles.desc}>{ spoken(content.lastUpdated) }</Text>
+            <Text style={styles.desc}>{spoken(content.lastUpdated)}</Text>
           </View>
         </View>
       </Link>

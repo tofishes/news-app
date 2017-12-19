@@ -5,7 +5,7 @@ import ScrollableTabView, { ScrollableTabBar } from 'react-native-scrollable-tab
 import Icon from '../components/icon';
 import NewsList from './parts/news-list';
 
-import colors from '../libs/colors';
+import { colors } from '../libs/styles';
 import { categories } from '../libs/request';
 
 const ScrollableTabProps = {
@@ -56,8 +56,9 @@ export default class List extends PureComponent {
   // }
 
   render() {
+    const { props } = this;
     const listPages = categories.map(item => (
-      <NewsList key={item} tabLabel={capitalize(item)} category={item} />
+      <NewsList {...props} key={item} tabLabel={capitalize(item)} category={item} />
     ));
 
     return (

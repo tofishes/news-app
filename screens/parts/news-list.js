@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ListView, RefreshControl } from 'react-native';
+import { ListView, RefreshControl, Text } from 'react-native';
 import store from 'react-native-simple-store';
 
 import NewsItem from './news-item';
@@ -21,6 +21,8 @@ export default class NewsList extends Component {
       refreshing: false,
       loading: false
     };
+
+    this.page = 1;
   }
 
   componentDidMount() {
@@ -51,7 +53,30 @@ export default class NewsList extends Component {
   }
 
   async loadMore() {
+    console.log('reach end......')
 
+    this.page += 1;
+
+    this.setState({
+      loading: true
+    });
+
+    const { data, status } = await request.getNewsList(this.props.category, this.page);
+
+    if (status === 304) {
+      this.setState({
+        loading: false
+      });
+
+      return;
+    }
+
+    const articles = data.getList('relations');
+
+    this.setState({
+      list: this.state.list.cloneWithRows(articles),
+      loading: false
+    });
   }
 
   refresh() {
@@ -63,16 +88,20 @@ export default class NewsList extends Component {
   }
 
   renderFooter() {
-    return <Loading show={this.state.loading} />;
+    const { loading, refreshing } = this.state;
+    return <Loading show={!refreshing && loading} />;
+    // return <Text>loading: {JSON.stringify(this.state.loading)}</Text>;
   }
 
   render() {
+    const { props } = this;
+
     function renderNewsRow(news) {
       if (!news) {
         return null;
       }
 
-      return <NewsItem data={news} />;
+      return <NewsItem {...props} data={news} />;
     }
 
     return (
@@ -86,7 +115,7 @@ export default class NewsList extends Component {
         }
         renderFooter={this.renderFooter.bind(this)}
         dataSource={this.state.list}
-        onEndReached={this.loadMore}
+        onEndReached={this.loadMore.bind(this)}
         renderRow={renderNewsRow}
         enableEmptySections
       />
