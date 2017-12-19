@@ -6,7 +6,7 @@ const categoryMap = {
   business: '/cps/news/business',
   technology: '/cps/news/technology',
   entertainment: '/cps/news/entertainment_and_arts',
-  science: '/cps/news/science_and_environment'
+  science: '/cps/news/science_and_environment',
 };
 
 
@@ -37,6 +37,12 @@ export default {
     data.relations = getPage(list, page);
 
     return { data, status };
+  },
+
+  async getNews(id) {
+    const response = await request.get(id);
+
+    return response.data;
   }
 };
 
