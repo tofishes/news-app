@@ -68,7 +68,6 @@ export default class Imager extends React.Component {
   }
 }
 
-
 Imager.defaultProps = {
   style: {},
   duration: 200
