@@ -1,24 +1,33 @@
 import React, { Component } from 'react';
-import { TouchableHighlight } from 'react-native';
+import { TouchableOpacity } from 'react-native';
+import { withNavigation } from 'react-navigation';
 import PropTypes from 'prop-types';
 
-import { alert } from '../components/tip';
-
-export default class Link extends Component {
+class Link extends Component {
   onPress() {
-    alert(this.props.href);
+    const { navigate } = this.props.navigation;
+    const { screen, param } = this.props.to;
+
+    navigate(screen, param);
   }
 
   render() {
     return (
-      <TouchableHighlight onPress={this.onPress.bind(this)}>
+      <TouchableOpacity onPress={this.onPress.bind(this)}>
         {this.props.children}
-      </TouchableHighlight>
+      </TouchableOpacity>
     );
   }
 }
 
-Link.propTypes = {
-  href: PropTypes.string.isRequired,
-  children: PropTypes.element.isRequired
+Link.defaultProps = {
+  to: {}
 };
+
+Link.propTypes = {
+  to: PropTypes.object,
+  children: PropTypes.element.isRequired,
+  navigation: PropTypes.any.isRequired
+};
+
+export default withNavigation(Link);
