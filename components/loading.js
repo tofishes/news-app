@@ -10,7 +10,7 @@ export default class Loading extends PureComponent {
 }
 
 Loading.defaultProps = {
-  show: false
+  show: true
 };
 
 Loading.propTypes = {
