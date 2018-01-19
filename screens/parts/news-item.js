@@ -50,7 +50,7 @@ export default class NewsItem extends PureComponent {
     return (
       <Link to={detailPage}>
         <View style={layout.row}>
-          <Image style={layout.cover} source={{ uri: cover.content.href }} />
+          <Image style={layout.cover} src={cover.content.href} />
           <View style={layout.info}>
             <Text style={styles.title}>{content.name}</Text>
             <Text style={styles.desc}>{spoken(content.lastUpdated)}</Text>

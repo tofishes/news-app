@@ -22,8 +22,8 @@ const ScrollableTabProps = {
   }
 };
 
-function capitalize(string) {
-  return string[0].toUpperCase() + string.slice(1);
+function capitalize([first, ...rest]) {
+  return first.toUpperCase() + rest.join('');
 }
 
 export default class List extends PureComponent {

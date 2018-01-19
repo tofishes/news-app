@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ListView, RefreshControl, Text } from 'react-native';
+import { ListView, RefreshControl } from 'react-native';
 import store from 'react-native-simple-store';
 
 import NewsItem from './news-item';

@@ -1,13 +1,11 @@
 import React, { PureComponent } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, ScrollView, Text, View, Button } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import PropTypes from 'prop-types';
-import cheerio from 'cheerio';
+import cheerio from 'react-native-cheerio';
 
-import Loading from '../components/loading';
-import { H2, H3 } from '../components/title';
-import Devider from '../components/divider';
-import Image from '../components/image';
+import { Loading, H1, H2, Divider, Image } from '../components';
+import DictPanel from './parts/dict-panel';
 
 import { spoken } from '../libs/date';
 import { colors } from '../libs/styles';
@@ -44,11 +42,29 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingVertical: 10
+  },
+  p: {
+    marginVertical: 6,
+    fontSize: 18,
+    color: colors.text
+  },
+  h: {
+    marginTop: 10,
+    fontSize: 20
+  },
+  canvas: {
+    backgroundColor: '#fff'
   }
 });
 
 function parseContent(news) {
-  const $ = cheerio.load(news.content);
+  if (!news.body) {
+    return <Text>news content is null...</Text>;
+  }
+
+  const $ = cheerio.load(news.body, {
+    xmlMode: true
+  });
   const imageMap = {};
   news.relations.map(item => {
     const info = item.content;
@@ -62,50 +78,67 @@ function parseContent(news) {
 
   const contents = $('paragraph, crosshead, image').map((i, elem) => {
     const $this = $(elem);
-    const text = $this.text();
-
-    if ($this.is('paragraph')) {
-      return <View style={styles.p}>{text}</View>;
-    }
-
-    if ($this.is('crosshead')) {
-      return <H3>{text}</H3>;
-    }
 
     if ($this.is('image')) {
       const id = $this.attr('id');
 
       if (imageMap[id]) {
-        return <Image source={{ uri: imageMap[id].href }} />;
+        return (
+          <View key={i} style={{ marginVertical: 6 }}>
+            <Image src={imageMap[id].href} offset="0 10" />
+          </View>
+        );
       }
+    }
+
+    const text = $this.text().split(' ').map((word, j) => {
+      const key = `${i}${j}`;
+      return <Text key={key} onPress={this.query.bind(this, word)}>{word} </Text>;
+    });
+
+    if ($this.is('paragraph')) {
+      return <Text key={i} style={styles.p}>{text}</Text>;
+    }
+
+    if ($this.is('crosshead')) {
+      return <H2 key={i} style={styles.h}>{text}</H2>;
     }
 
     return null;
   }).get();
 
-  return <Text>内容显示</Text>;
+  return contents;
 }
 
 class Detail extends PureComponent {
-  static navigationOptions = {
-    headerTitle: 'Reading',
-    headerBackTitle: '',
-    headerStyle: {
-      backgroundColor: colors.theme
-    },
-    headerTitleStyle: {
-      color: '#fff'
-    },
-    headerBackTitleStyle: {
-      color: '#fff'
-    }
+  static navigationOptions = ({ navigation }) => {
+    const { goBack } = navigation;
+
+    const headerLeft = (
+      <Button onPress={() => goBack()} title="list" color="#fff" />
+    );
+
+    return {
+      headerTitle: 'Reading',
+      headerLeft,
+      headerStyle: {
+        backgroundColor: colors.theme
+      },
+      headerTitleStyle: {
+        color: '#fff'
+      },
+      headerBackTitleStyle: {
+        color: '#fff'
+      }
+    };
   }
 
   constructor(props) {
     super(props);
 
     this.state = {
-      news: null
+      news: null,
+      word: null
     };
   }
 
@@ -123,26 +156,35 @@ class Detail extends PureComponent {
     });
   }
 
+  query(word) {
+    this.setState({
+      word
+    });
+  }
+
   render() {
-    const { news } = this.state;
+    const { news, word } = this.state;
     const content = news === null
-      ? <Loading show />
+      ? <Loading />
       : (
-        <View>
-          <H2 style={styles.title}>{news.name}字体大小</H2>
+        <View style={styles.canvas}>
+          <H1 style={styles.title}>{news.name}</H1>
           <View style={[styles.info]}>
             <Text style={styles.time}>{spoken(news.lastUpdated)}</Text>
             <View style={styles.divider} />
             <Text style={styles.light}>{news.iStatsLabels.page_type}</Text>
           </View>
-          <Devider />
+          <Divider />
 
-          <View style={styles.content}>{parseContent(news)}</View>
+          <View style={styles.content}>{parseContent.bind(this)(news)}</View>
         </View>
       );
 
     return (
-      <View style={styles.article}>{content}</View>
+      <ScrollView style={styles.article}>
+        {content}
+        <DictPanel query={word} />
+      </ScrollView>
     );
   }
 }
